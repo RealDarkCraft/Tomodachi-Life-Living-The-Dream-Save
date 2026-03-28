@@ -264,4 +264,4 @@ class TomodachiLifeLtdSaveReader:
             json.dump(hashs, f, indent = 4)
             
         self.parseValue()
-TomodachiLifeLtdSaveReader().read(r"C:\Users\celes\AppData\Roaming\Ryujinx\bis\user\save\0000000000000001\0\Mii.sav")
+TomodachiLifeLtdSaveReader().read(r"Mii.sav")

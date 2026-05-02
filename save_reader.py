@@ -82,18 +82,23 @@ class TomodachiLifeLtdSaveReader:
         for i in range(numfloat):
             array.append(struct.unpack('<f', self.reader.read(0x4))[0])
         return array
-    
-    def readDoubleArray(self, p):
+    def readVector2f(self, p):
         self.reader.seek(p)
-        numdouble = int.from_bytes(self.reader.read(0x4), byteorder = "little")
+        v1, v2 = struct.unpack('<ff', self.reader.read(0x8))
+        return {"x":v1, "y":v2}
+    def readVector2fArray(self, p):
+        self.reader.seek(p)
+        numvector = int.from_bytes(self.reader.read(0x4), byteorder = "little")
         array = []
-        for i in range(numdouble):
-            array.append(struct.unpack('<d', self.reader.read(0x8))[0])
+        index = p + 0x4
+        for i in range(numvector):
+            array.append(self.readVector2f(index))
+            index += 0x8
         return array
     def readVector3f(self, p):
         self.reader.seek(p)
         v1, v2, v3 = struct.unpack('<fff', self.reader.read(0xc))
-        return {"x":v1, "y":v2, "z":v3} #idk if it's xyz but i name them like this for now
+        return {"x":v1, "y":v2, "z":v3}
     def readVector3fArray(self, p):
         self.reader.seek(p)
         numvector = int.from_bytes(self.reader.read(0x4), byteorder = "little")
@@ -139,15 +144,12 @@ class TomodachiLifeLtdSaveReader:
                     case "7":
                         # idk array
                         self.value[item["hash"]] = self.readIntArray(item["offset"], 4, signed = False)
-
-
                     case "8":
-                        # double
-                        self.reader.seek(item["offset"])
-                        self.value[item["hash"]] = struct.unpack('<d', self.reader.read(8))[0]
+                        # vec2f
+                        self.value[item["hash"]] = self.readVector2f(item["offset"])
                     case "9":
-                        # double array
-                        self.value[item["hash"]] = self.readDoubleArray(item["offset"])
+                        # vec2f array
+                        self.value[item["hash"]] = self.readVector2fArray(item["offset"])
                     case "10":
                         # vec3f
                         self.value[item["hash"]] = self.readVector3f(item["offset"])
